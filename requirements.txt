@@ -194,7 +194,6 @@ tensorflow-intel==2.15.0
 tensorflow-io-gcs-filesystem==0.31.0
 termcolor==2.4.0
 terminado==0.18.0
--e git+https://github.com/SakshamGarg16/Text-Summarization.git@ef8ae55c54b2f198637bbf00daf57e475dd46148#egg=textSummarization
 texttable==1.7.0
 threadpoolctl==3.5.0
 timm==0.9.12
