@@ -20,6 +20,8 @@ def classify_crop(N,P,K,temperature,humidity,ph,rainfall):
     pred = __model.predict([Y])
     return _Classes[round(pred[0])]
 
+
+
 def retreve_File_crop():
     global __model
     global _Classes
@@ -29,6 +31,24 @@ def retreve_File_crop():
         _Classes = json.load(f)['plants']
     
     print ("Load Complete")
+    
+# Temparature	Humidity	Moisture	Nitrogen	Potassium	Phosphorous	Soil_Type	Crop_Type
+def classify_ferti(N,P,K,temperature,humidity,moist,soil_type,crop_type):
+    retreve_File_ferti()
+    
+    Y = np.array([])
+    Y = np.zeros(8)
+    Y[0]= temperature
+    Y[1]= humidity
+    Y[2]= moist
+    Y[3]= N
+    Y[4]= K
+    Y[5]= P
+    Y[6]= soil_type
+    Y[7] = crop_type
+    
+    pred = __model.predict([Y])
+    return _Classes[round(pred[0])]
     
 def retreve_File_ferti():
     global __model

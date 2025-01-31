@@ -24,5 +24,24 @@ def classify_crop():
     
     return response 
 
+@app.route('/ferti_prediction',methods = ['post'])
+def classify_ferti():  
+    data = request.json  
+    N = float(data['N'])
+    P = float(data['P'])
+    K = float(data['K'])	
+    temperature = float(data['temp'])
+    humidity    = float(data['humid'])
+    moist = float(data['moist'])
+    soil_type = float(data['soil_type'])
+    crop_type = float(data['crop_type'])
+    
+    response = jsonify({
+        'estimated':util.classify_ferti(N,P,K,temperature,humidity,moist,soil_type,crop_type)
+    })
+    response.headers.add('Access-Control-Allow-Origin','*')
+    
+    return response 
+
 if __name__ == '__main__':
     app.run()
