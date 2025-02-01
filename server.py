@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app, origins="*")
 
 @app.route('/',methods = ['get'])
-def classify_crop():      
+def index():      
     return "Agro Predict" 
 
 @app.route('/crop_prediction',methods = ['post'])
