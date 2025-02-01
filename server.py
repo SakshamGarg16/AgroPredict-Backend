@@ -6,6 +6,10 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, origins="*")
 
+@app.route('/',methods = ['get'])
+def classify_crop():      
+    return "Agro Predict" 
+
 @app.route('/crop_prediction',methods = ['post'])
 def classify_crop():  
     data = request.json  
