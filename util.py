@@ -1,6 +1,8 @@
 import pickle
 import numpy as np
 import json
+import os
+from pathlib import Path
 
 _Classes = None
 __model = None
@@ -25,9 +27,17 @@ def classify_crop(N,P,K,temperature,humidity,ph,rainfall):
 def retreve_File_crop():
     global __model
     global _Classes
-    with open(r'Model\cropPred.pkl','rb') as f:
+    
+    # Get the directory of the current file
+    current_dir = Path(__file__).parent
+
+    # Construct the full path
+    model_path = current_dir / 'Model' / 'cropPred.pkl'
+    artifact_path = current_dir / 'artifact' / 'cropPred.json'
+    
+    with open(model_path,'rb') as f:
         __model = pickle.load(f)
-    with open(r'artifact\cropPred.json','rb') as f:
+    with open(artifact_path,'rb') as f:
         _Classes = json.load(f)['plants']
     
     print ("Load Complete")
@@ -53,9 +63,19 @@ def classify_ferti(N,P,K,temperature,humidity,moist,soil_type,crop_type):
 def retreve_File_ferti():
     global __model
     global _Classes
-    with open(r'Model\fertilizerPred.pkl','rb') as f:
+    
+    
+    # Get the directory of the current file
+    current_dir = Path(__file__).parent
+
+    # Construct the full path
+    model_path = current_dir / 'Model' / 'fertilizerPred.pkl'
+    artifact_path = current_dir / 'artifact' / 'fertilizerPred.json'
+    
+    
+    with open(model_path,'rb') as f:
         __model = pickle.load(f)
-    with open(r'artifact\fertilizerPred.json','rb') as f:
+    with open(artifact_path,'rb') as f:
         _Classes = json.load(f)['Fertilizers']
     
     print ("Load Complete")
