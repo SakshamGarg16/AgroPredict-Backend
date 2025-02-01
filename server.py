@@ -22,7 +22,7 @@ def classify_crop():
     rainfall = float(data['rain'])
     
     response = jsonify({
-        'estimated':util.classify_crop(N,P,K,temperature,humidity,ph,rainfall)
+        'recommended_crop':util.classify_crop(N,P,K,temperature,humidity,ph,rainfall)
     })
     response.headers.add('Access-Control-Allow-Origin','*')
     
@@ -41,7 +41,7 @@ def classify_ferti():
     crop_type = float(data['crop_type'])
     
     response = jsonify({
-        'estimated':util.classify_ferti(N,P,K,temperature,humidity,moist,soil_type,crop_type)
+        'recommended_fertilizer':util.classify_ferti(N,P,K,temperature,humidity,moist,soil_type,crop_type)
     })
     response.headers.add('Access-Control-Allow-Origin','*')
     
