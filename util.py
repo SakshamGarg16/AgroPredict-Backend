@@ -2,10 +2,19 @@ import pickle
 import numpy as np
 import json
 import os
+import base64
+import joblib
+import cv2
 from pathlib import Path
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow.keras.applications import ResNet50
+import cv2 as cv
 
 _Classes = None
 __model = None
+svm_model = None
+pca=None
+class_indices={}
 
 def classify_crop(N,P,K,temperature,humidity,ph,rainfall):
     retreve_File_crop()
@@ -80,7 +89,70 @@ def retreve_File_ferti():
     
     print ("Load Complete")
     
+def classify_image(base64_str):
+    
+    image = converter(base64_str)
+    
+    image  = cv2.resize(image,(128,128))
+    
+    base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(128, 128, 3))
+    
+    retrievefiles()
+    
+    
+    image_array = img_to_array(image) / 255.0            # Normalize pixel values
+    image_array = np.expand_dims(image_array, axis=0)    # Add batch dimension
+
+    # Step 2: Extract features using ResNet50
+    print("Extracting features for the image...")
+    features = base_model.predict(image_array, verbose=0)
+    features_flattened = features.reshape(1, -1)  # Flatten the features
+
+    # Step 3: Apply PCA for dimensionality reduction
+    features_reduced = pca.transform(features_flattened)
+
+    # Step 4: Make prediction with SVM
+    prediction = svm_model.predict(features_reduced)
+
+    # Step 5: Map prediction to class label
+    predicted_label = class_indices.get(int(prediction[0]))
+    
+    print (predicted_label)
+
+    return predicted_label
+
+
+def converter(b64str):
+    encoded_data = b64str.split(',')[1]
+    nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
+    img = cv.imdecode(nparr, cv.IMREAD_COLOR)    
+    return img
+
+def retrievefiles():
+    # Load the saved models
+    global svm_model
+    global pca
+    global class_indices
+    
+    # Get the directory of the current file
+    current_dir = Path(__file__).parent
+    
+    model_path = current_dir / 'Model' / 'svm_model.pkl'
+    pca_path = current_dir / 'Model' / 'pca_model.pkl'
+    artifact_path = current_dir / 'Model' / 'class_indices.json'
+    
+    svm_model = joblib.load(model_path)
+    pca = joblib.load(pca_path)
+    
+    # Load class indices
+    with open(artifact_path, 'r') as f:
+        class_indices = json.load(f)
+# Convert string keys to integers
+    class_indices = {int(v): k for k, v in class_indices.items()} 
+        
+    print("load complete")
+  
 if __name__ == ('__main__'):
     # classify(49 , 69,  82,18.315615,15.361435 , 7.263119,   81.787105)
-      None  
+    None  
     
