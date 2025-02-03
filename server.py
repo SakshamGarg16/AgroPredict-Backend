@@ -47,5 +47,15 @@ def classify_ferti():
     
     return response 
 
+@app.route('/classify_image',methods =["GET","POST"])
+def classify_Image():
+    image = request.json['image']
+    
+    response = jsonify({
+        "disease_predicted" : util.classify_image(image)})
+    response.headers.add('Access-Control-Allow-Origin','*')
+    
+    return response
+
 if __name__ == '__main__':
     app.run(debug=True)
