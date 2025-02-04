@@ -4,7 +4,6 @@ import json
 import os
 import base64
 import joblib
-import cv2
 from pathlib import Path
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications import ResNet50
@@ -89,11 +88,12 @@ def retreve_File_ferti():
     
     print ("Load Complete")
     
-def classify_image(base64_str):
+def classify_image(path):
     
-    image = converter(base64_str)
+    # image = converter(base64_str)
+    image = cv.imread(path)
     
-    image  = cv2.resize(image,(128,128))
+    image  = cv.resize(image,(128,128))
     
     base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(128, 128, 3))
     
@@ -121,12 +121,6 @@ def classify_image(base64_str):
 
     return predicted_label
 
-
-def converter(b64str):
-    encoded_data = b64str.split(',')[1]
-    nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
-    img = cv.imdecode(nparr, cv.IMREAD_COLOR)    
-    return img
 
 def retrievefiles():
     # Load the saved models
