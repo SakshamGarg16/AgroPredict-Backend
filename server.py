@@ -5,6 +5,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app, origins="*")
+app.config['SERVER_TIMEOUT'] = 1000
 
 @app.route('/',methods = ['get'])
 def index():      
