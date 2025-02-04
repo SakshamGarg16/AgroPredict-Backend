@@ -9,7 +9,8 @@ app = Flask(__name__)
 CORS(app, origins="*")
 
 UPLOAD_FOLDER = '/tmp/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 @app.route('/',methods = ['get'])
 def index():      
