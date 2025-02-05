@@ -6,7 +6,7 @@ import base64
 import joblib
 from pathlib import Path
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
-from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications import MobileNetV2
 import cv2 as cv
 
 _Classes = None
@@ -95,7 +95,7 @@ def classify_image(path):
     
     image  = cv.resize(image,(128,128))
     
-    base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(128, 128, 3))
+    base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(128, 128, 3))
     
     retrievefiles()
     
@@ -131,8 +131,8 @@ def retrievefiles():
     # Get the directory of the current file
     current_dir = Path(__file__).parent
     
-    model_path = current_dir / 'Model' / 'svm_model.pkl'
-    pca_path = current_dir / 'Model' / 'pca_model.pkl'
+    model_path = current_dir / 'Model' / 'svm_mobile_model.pkl'
+    pca_path = current_dir / 'Model' / 'pca_mobilenet_model.pkl'
     artifact_path = current_dir / 'Model' / 'class_indices.json'
     
     svm_model = joblib.load(model_path)
