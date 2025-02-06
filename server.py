@@ -7,7 +7,7 @@ import os
 
 app = Flask(__name__)
 CORS(app, origins="*")
-app.config['SERVER_TIMEOUT'] = 1000
+app.config['SERVER_TIMEOUT'] = 10000
 
 UPLOAD_FOLDER = '/tmp/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)  
