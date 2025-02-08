@@ -151,6 +151,65 @@ def retrievefiles():
     class_indices = {int(v): k for k, v in class_indices.items()} 
         
     print("load complete")
+    
+def crop_price(State,District,Market,Commodity,varity):
+    crop_price_retrive()
+    min,max = minMax(State,District,Commodity)
+    State = state_e[State]
+    District = district_e[District]
+    Market = market_e[Market]
+    Commodity = commmodity_e[Commodity]
+    varity = varity_e[varity]
+    pred = __model.predict([[State,District,Market,Commodity,varity,min,max]])[0]
+    return pred
+    
+def minMax(State,District,Commodity):
+    key = (State.lower(), District.lower(), Commodity.lower())
+
+    if key in MinMax_model:
+        min_price = min(MinMax_model[key]['min_prices'])
+        max_price = max(MinMax_model[key]['max_prices'])
+        return min_price, max_price
+    else:
+        all_prices = [vals for vals in MinMax_model.values()]
+        mean_min_price = sum(p['min_prices'][0] for p in all_prices) / len(all_prices)
+        mean_max_price = sum(p['max_prices'][0] for p in all_prices) / len(all_prices)
+        return mean_min_price, mean_max_price
+
+def crop_price_retrive():
+    global state_e, district_e, market_e, commmodity_e, varity_e, MinMax_model
+    global __model
+    
+    current_dir = Path(__file__).parent
+    path = current_dir / 'Model' / 'State_Encode.json'  
+      
+    with open (path,'rb') as f:
+        state_e  = json.load(f)
+        
+    path = current_dir / 'Model' / 'District_Encode.json' 
+    with open (path,'rb') as f:
+        district_e  = json.load(f)
+        
+    path = current_dir / 'Model' / 'Market_Encode.json' 
+    with open (path,'rb') as f:
+        market_e  = json.load(f)
+    
+    path = current_dir / 'Model' / 'Commodity_Encode.json' 
+    with open (path,'rb') as f:
+        commmodity_e  = json.load(f)
+    
+    path = current_dir / 'Model' / 'Varity_Encode.json' 
+    with open (path,'rb') as f:
+        varity_e  = json.load(f)
+        
+    path = current_dir / 'Model' / 'crop_prices.pkl' 
+    with open (path,'rb') as f:
+        MinMax_model  = pickle.load(f)
+    
+    path = current_dir / 'Model' / 'cropPrice.pkl' 
+    with open (path,'rb') as f:
+        __model  = pickle.load(f)
+    
   
 if __name__ == ('__main__'):
     # classify(49 , 69,  82,18.315615,15.361435 , 7.263119,   81.787105)

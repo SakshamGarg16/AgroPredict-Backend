@@ -58,5 +58,22 @@ def classify_Image():
     
     return response
 
+@app.route('/crop_price',methods = ['post'])
+def crop_price():  
+    data = request.json  
+    State = data['State']
+    District = data['District']
+    Market = data['Market']	
+    Commodity = data['Commodity']
+    varity    = data['Varity']
+    
+    response = jsonify({
+        'estimated_price':util.crop_price(State,District,Market,Commodity,varity)
+    })
+    response.headers.add('Access-Control-Allow-Origin','*')
+    
+    return response 
+
+
 if __name__ == '__main__':
     app.run(debug=True)
