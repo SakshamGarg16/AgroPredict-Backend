@@ -88,11 +88,10 @@ def retreve_File_ferti():
     
     print ("Load Complete")
     
-def classify_image(path):
+def classify_image(base64_str):
     
-    # image = converter(base64_str)
-    image = cv.imread(path)
-    
+    image = converter(base64_str)
+    # image = cv.imread(path)
     image  = cv.resize(image,(128,128))
     
     base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(128, 128, 3))
@@ -120,6 +119,13 @@ def classify_image(path):
     print (predicted_label)
 
     return predicted_label
+
+
+def converter(b64str):
+    encoded_data = b64str.split(',')[1]
+    nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
+    img = cv.imdecode(nparr, cv.IMREAD_COLOR)    
+    return img
 
 
 def retrievefiles():

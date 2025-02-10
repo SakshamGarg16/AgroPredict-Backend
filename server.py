@@ -1,79 +1,69 @@
-from flask import Flask,request,jsonify
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import util
-from flask_cors import CORS
-from werkzeug.utils import secure_filename
-import os
 
+app = FastAPI()
 
-app = Flask(__name__)
-CORS(app, origins="*")
-app.config['SERVER_TIMEOUT'] = 10000
+# Allow CORS for all origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-UPLOAD_FOLDER = '/tmp/uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)  
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+class CropInput(BaseModel):
+    N: float
+    P: float
+    K: float
+    temp: float
+    humid: float
+    ph: float
+    rain: float
 
-@app.route('/',methods = ['get'])
-def index():      
-    return "Agro Predict" 
+class FertiInput(BaseModel):
+    N: float
+    P: float
+    K: float
+    temp: float
+    humid: float
+    moist: float
+    soil_type: float
+    crop_type: float
 
-@app.route('/crop_prediction',methods = ['post'])
-def classify_crop():  
-    data = request.json  
-    N = float(data['N'])
-    P = float(data['P'])
-    K = float(data['K'])	
-    temperature = float(data['temp'])
-    humidity    = float(data['humid'])
-    ph = float(data['ph'])
-    rainfall = float(data['rain'])
+class CropPriceInput(BaseModel):
+    State: str
+    District: str
+    Market: str
+    Commodity: str
+    Varity: str
+
+class ImagePredict(BaseModel):
+    Image: str
+
+@app.post("/crop_prediction")
+def classify_crop(data: CropInput):
+    result = util.classify_crop(data.N, data.P, data.K, data.temp, data.humid, data.ph, data.rain)
+    return {"estimated": result}
+
+@app.post("/ferti_prediction")
+def classify_ferti(data: FertiInput):
+    result = util.classify_ferti(data.N, data.P, data.K, data.temp, data.humid, data.moist, data.soil_type, data.crop_type)
+    return {"estimated": result}
+
+@app.post("/crop_price")
+def crop_price(data: CropPriceInput):
+    result = util.crop_price(data.State, data.District, data.Market, data.Commodity, data.Varity)
+    return {"estimated_price": result}
+
+@app.post("/classify_image")
+def image_classi(data: ImagePredict):
+    result = util.classify_image(data.Image)
+    return {"Disease":result}
     
-    response = jsonify({
-        'recommended_crop':util.classify_crop(N,P,K,temperature,humidity,ph,rainfall)
-    })
-    response.headers.add('Access-Control-Allow-Origin','*')
     
-    return response 
-
-@app.route('/ferti_prediction',methods = ['post'])
-def classify_ferti():  
-    data = request.json  
-    N = float(data['N'])
-    P = float(data['P'])
-    K = float(data['K'])	
-    temperature = float(data['temp'])
-    humidity    = float(data['humid'])
-    moist = float(data['moist'])
-    soil_type = float(data['soil_type'])
-    crop_type = float(data['crop_type'])
-    
-    response = jsonify({
-        'recommended_fertilizer':util.classify_ferti(N,P,K,temperature,humidity,moist,soil_type,crop_type)
-    })
-    response.headers.add('Access-Control-Allow-Origin','*')
-    
-    return response 
-
-@app.route('/classify_image',methods =["GET","POST"])
-def classify():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image part in the request'}), 40
-    image = request.files['image']
-    
-    
-    try:
-        filename = secure_filename(image.filename)
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        image.save(image_path)
-        predicted_label = util.classify_image(path=image_path)
-
-        os.remove(image_path)
-
-        return jsonify({"disease_predicted": predicted_label})
-
-    except Exception as e:
-        app.logger.error(f"Error: {e}")
-        return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__=='__main__':
+    import uvicorn
+    uvicorn.run(app)
