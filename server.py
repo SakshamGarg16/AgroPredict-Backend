@@ -43,6 +43,10 @@ class CropPriceInput(BaseModel):
 class ImagePredict(BaseModel):
     Image: str
 
+@app.get("/")
+def initial():
+    return "Hi"
+
 @app.post("/crop_prediction")
 def classify_crop(data: CropInput):
     result = util.classify_crop(data.N, data.P, data.K, data.temp, data.humid, data.ph, data.rain)
